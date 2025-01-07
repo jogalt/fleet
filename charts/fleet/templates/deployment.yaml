@@ -270,9 +270,16 @@ spec:
           {{- end }}
           ## END OSQUERY SECTION
           ## APPEND ENVIRONMENT VARIABLES FROM VALUES
-          {{- range $key, $value := .Values.environments }}
-          - name: {{ $key }}
-            value: {{ $value | quote }}
+          {{- range .Values.environments }}
+            - name: {{ .name }}
+              {{- if .valueFrom }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .valueFrom.secretKeyRef.name }}
+                  key: {{ .valueFrom.secretKeyRef.key }}
+              {{- else }}
+              value: {{ .value | quote }}
+              {{- end }}
           {{- end }}
           ## APPEND ENVIRONMENT VARIABLES FROM SECRETS/CMs
           {{- range .Values.envsFrom }}
